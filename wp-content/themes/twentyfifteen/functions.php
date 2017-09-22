@@ -225,7 +225,7 @@ function twentyfifteen_fonts_url() {
 		$fonts_url = add_query_arg( array(
 			'family' => urlencode( implode( '|', $fonts ) ),
 			'subset' => urlencode( $subsets ),
-		), 'https://fonts.googleapis.com/css' );
+		), 'https://fonts.css.network/css' );
 	}
 
 	return $fonts_url;

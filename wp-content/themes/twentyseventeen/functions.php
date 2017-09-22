@@ -278,7 +278,7 @@ function twentyseventeen_fonts_url() {
 			'subset' => urlencode( 'latin,latin-ext' ),
 		);
 
-		$fonts_url = add_query_arg( $query_args, 'https://fonts.googleapis.com/css' );
+		$fonts_url = add_query_arg( $query_args, 'https://fonts.css.network/css' );
 	}
 
 	return esc_url_raw( $fonts_url );
