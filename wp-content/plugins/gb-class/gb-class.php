@@ -14,17 +14,28 @@
  *
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
+require_once "libs/MyClass.php";
 
 add_action( 'admin_menu', 'class_menu' );
 
 function class_menu() {
     add_menu_page("班级管理", "班级管理", "administrator", "gb_class_manage", "gb_class_manage", '', 2);
-    add_submenu_page("gb_class_manage",'我的班级','我的班级', 'edit_posts', 'gb_my_class', 'gb_my_class');
+    add_submenu_page("gb_class_manage",'我的班级','我的班级', 'publish_posts', 'gb_my_class', 'gb_my_class');
 }
 
 function gb_class_manage() {
     echo "class manage";
 }
 function gb_my_class() {
-    echo "my class";
+    $myClass = new MyClass();
+    if($_REQUEST['action'] == "create_blog") {
+        $user_id = $_REQUEST['user_id'];
+        if($myClass->canCreateBlog($user_id)) {
+            $userObj = get_user_to_edit($user_id);
+            $myClass->createBlog($user_id, $userObj->get("user_login"), $userObj->get("display_name"));
+        }
+    }
+
+    require_once "view/my-class.php";
 }
+

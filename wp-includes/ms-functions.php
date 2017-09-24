@@ -1117,7 +1117,7 @@ function wpmu_create_blog( $domain, $path, $title, $user_id, $meta = array(), $s
 	);
 	$meta = wp_parse_args( $meta, $defaults );
 
-	$domain = preg_replace( '/\s+/', '', sanitize_user( $domain, true ) );
+	$domain = preg_replace( '/\s+/', '', sanitize_user( $domain, false ) );
 
 	if ( is_subdomain_install() )
 		$domain = str_replace( '@', '', $domain );
