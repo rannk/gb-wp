@@ -36,6 +36,11 @@ function gb_my_class() {
         }
     }
 
+    $teacher_meta = get_user_meta(get_current_user_id());
+    $class_id = $teacher_meta["teach_class"][0];
+
+    $students = $myClass->getClassStudents($class_id);
+
     require_once "view/my-class.php";
 }
 

@@ -88,8 +88,12 @@ class MyClass {
         if($class_id == 0)
             return;
 
-        $sql = "select u.* from " . $wpdb->prefix."users u inner join
+        $sql = "select u.*,b.* from " . $wpdb->prefix."users u inner join
             "  . $wpdb->prefix ."usermeta um1 on um1.user_id=u.ID
-            where um1.meta_key='study_class' and um1.meta_value=" . $class_id;
+            inner join " . $wpdb->prefix . "usermeta um2 on um2.user_id=u.ID
+            inner join ". $wpdb->prefix . "blogs b on um2.meta_value=b.blog_id
+            where um1.meta_key='study_class' and um2.meta_key='primary_blog' and um1.meta_value=" . $class_id;
+
+        return $wpdb->get_results($sql, ARRAY_A);
     }
 } 

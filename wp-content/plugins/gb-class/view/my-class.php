@@ -17,34 +17,32 @@
                         <th scope="col" id="description" class="manage-column column-description">
                             <a><span>邮箱</span></a></th>
                         <th scope="col" id="description" class="manage-column column-description">
-                            <a><span>操作</span></a></th>
+                            <a><span>博客</span></a></th>
                     </thead>
 
                     <tbody id="the-list" data-wp-lists="list:tag">
-                    <tr id="tag-1">
-                        <td>小王</td>
-                        <td>bob</td>
-                        <td>efe@fef.cn</td>
-                        <td><a>开通博客</a></td>
+                    <?php
+                    for($i=0;$i<count($students);$i++) {
+                        $v = $students[$i];
+                    ?>
+                    <tr id="tag-<?=$i?>">
+                        <td class="username column-username has-row-actions column-primary"><?=get_avatar($v['ID'],32)?><strong><?=$v['display_name']?></strong></td>
+                        <td><?=$v['user_login']?></td>
+                        <td><?=$v['user_email']?></td>
+                        <td>
+                            <?php
+                            if($v['blog_id']>1) {
+                                echo '<a href="http://'.$v['domain'].$v['path'].'" target="_blank">查看</a> | ';
+                                echo '<a href="http://'.$v['domain'].$v['path'].'wp-admin/">仪表盘</a>';
+                            }else {
+                                echo '<a href="/wp-admin/admin.php?page=gb_my_class&action=create_blog&user_id='.$v['ID'].'">开通博客</a>';
+                            }
+                            ?>
+                        </td>
                     </tr>
-                    <tr id="tag-2">
-                        <td>小王</td>
-                        <td>bob</td>
-                        <td>efe@fef.cn</td>
-                        <td><a>开通博客</a></td>
-                    </tr>
-                    <tr id="tag-3">
-                        <td>小王</td>
-                        <td>bob</td>
-                        <td>efe@fef.cn</td>
-                        <td><a>开通博客</a></td>
-                    </tr>
-                    <tr id="tag-4">
-                        <td>小王</td>
-                        <td>bob</td>
-                        <td>efe@fef.cn</td>
-                        <td><a>开通博客</a></td>
-                    </tr>
+                    <?php
+                    }
+                    ?>
                 </table>
         </div>
     </div>
