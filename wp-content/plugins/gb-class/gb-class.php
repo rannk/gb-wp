@@ -15,19 +15,44 @@
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 require_once "libs/MyClass.php";
+require_once "libs/lang.php";
+require_once "libs/GbClass.php";
+
+//插件启用时检测数据库
+register_activation_hook( __FILE__, 'gb_class_install');
+function gb_class_install() {
+    global $wpdb;
+    $sql = "CREATE TABLE IF NOT EXISTS `gb_class` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `class_name` varchar(200) NOT NULL DEFAULT '',
+      `class_tag` varchar(100) NOT NULL,
+      `student_count` int(11) NOT NULL DEFAULT '0',
+      `class_status` tinyint(4) NOT NULL DEFAULT '1',
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `class_tag` (`class_tag`)
+    ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4";
+    $wpdb->query($sql);
+}
 
 add_action( 'admin_menu', 'class_menu' );
 
 function class_menu() {
-    add_menu_page("班级管理", "班级管理", "administrator", "gb_class_manage", "gb_class_manage", '', 2);
-    add_submenu_page("gb_class_manage",'我的班级','我的班级', 'publish_posts', 'gb_my_class', 'gb_my_class');
+    add_menu_page(_l("Class Manage"), _l("Class Manage"), "administrator", "gb_class_manage", "gb_class_manage", '', 2);
+    add_submenu_page("gb_class_manage", _l("My Class"), _l("My Class"), 'gb_my_class', 'gb_my_class', 'gb_my_class');
 }
 
 function gb_class_manage() {
-    echo "class manage";
+    $gbClass = new GbClass();
+    $class_lists = $gbClass->getLists();
+    require_once "view/manage-class.php";
 }
 function gb_my_class() {
     $myClass = new MyClass();
+    $gbClass = new GbClass();
+
+    $teacher_meta = get_user_meta(get_current_user_id());
+    $class_id = $teacher_meta["teach_class"][0];
+
     if($_REQUEST['action'] == "create_blog") {
         $user_id = $_REQUEST['user_id'];
         if($myClass->canCreateBlog($user_id)) {
@@ -36,11 +61,19 @@ function gb_my_class() {
         }
     }
 
-    $teacher_meta = get_user_meta(get_current_user_id());
-    $class_id = $teacher_meta["teach_class"][0];
+    $class_save_result = false;
+    if($_REQUEST['action'] == "save_class") {
+        require_once ("saveClass.php");
+        if($class_save_result) {
+            $gbClass->changeClassTeacher(get_current_user_id());
+        }
+    }
+
+    $classObj = $gbClass->instanceObj($class_id);
 
     $students = $myClass->getClassStudents($class_id);
 
     require_once "view/my-class.php";
 }
+
 

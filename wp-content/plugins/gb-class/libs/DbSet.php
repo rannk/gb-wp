@@ -13,7 +13,7 @@ class DbSet {
 
     public function __construct($table, $key_name, $id=""){
         global $wpdb;
-        $this->table = $wpdb->base_prefix.$table;
+        $this->table = $table;
         $this->key_name = $key_name;
         $this->getPostTableStructure();
         $this->id = ceil($id);

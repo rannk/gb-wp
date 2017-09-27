@@ -1,53 +1,44 @@
 <script src="/wp-content/plugins/gb-class/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href="/wp-content/plugins/gb-class/css/bootstrap.css" type="text/css">
 <div class="wrap nosubsub">
-    <h1><?=_l("My Class")?> </h1>
+    <h1><?=_l("Class Manage")?> </h1>
     <?php
     for($i=0;$i<count($ret_msg);$i++) {
         echo '<div class="err_msg">' . $ret_msg[$i] . "</div>";
     }
-    if($class_id > 0) {
         ?>
-        <div id="class_header">
-            <div class="tip"><?=$classObj->getVar("class_name")?> (<?=$classObj->getVar("class_tag")?>)</div>
-            <input type="button" value="<?=_l("Modify Class Name")?>" data-toggle="modal" data-target="#myModal">
-        </div>
         <div>
             <div class="col-wrap">
-                <h2 class="screen-reader-text"><?=_l("Student Lists")?></h2>
+                <h2 class="screen-reader-text"><?=_l("Class Lists")?></h2>
                 <table class="wp-list-table widefat fixed striped tags">
                     <thead>
                     <tr>
 
                         <th scope="col" id="name" class="manage-column column-name column-primary">
-                            <a><span><?=_l("Student Name")?></span></a></th>
+                            <a><span><?=_l("Class Name")?></span></a></th>
                         <th scope="col" id="description" class="manage-column column-description">
-                            <a><span><?=_l("Login Account")?></span></a></th>
+                            <a><span><?=_l("Class Tag")?></span></a></th>
                         <th scope="col" id="description" class="manage-column column-description">
-                            <a><span><?=_l("Email")?></span></a></th>
+                            <a><span><?=_l("Teacher")?></span></a></th>
                         <th scope="col" id="description" class="manage-column column-description">
-                            <a><span><?=_l("Blog")?></span></a></th>
+                            <a><span><?=_l("Student Counts")?></span></a></th>
+                        <th scope="col" id="description" class="manage-column column-description">
+                            <a><span><?=_l("Manage")?></span></a></th>
                     </thead>
 
                     <tbody id="the-list" data-wp-lists="list:tag">
                     <?php
-                    for ($i = 0; $i < count($students); $i++) {
-                        $v = $students[$i];
+                    for ($i = 0; $i < count($class_lists); $i++) {
+                        $v = $class_lists[$i];
                         ?>
                         <tr id="tag-<?= $i ?>">
-                            <td class="username column-username has-row-actions column-primary"><?= get_avatar($v['ID'], 32) ?>
-                                <strong><?= $v['display_name'] ?></strong></td>
-                            <td><?= $v['user_login'] ?></td>
-                            <td><?= $v['user_email'] ?></td>
+                            <td class="username column-username has-row-actions column-primary">
+                                <strong><?= $v['class_name'] ?></strong></td>
+                            <td><?= $v['class_tag'] ?></td>
+                            <td><?= $v['display_name'] ?></td>
+                            <td><?= $v['student_count'] ?></td>
                             <td>
-                                <?php
-                                if ($v['blog_id'] > 1) {
-                                    echo '<a href="http://' . $v['domain'] . $v['path'] . '" target="_blank">'._l("View").'</a> | ';
-                                    echo '<a href="http://' . $v['domain'] . $v['path'] . 'wp-admin/">'._l("Dashboard").'</a>';
-                                } else {
-                                    echo '<a href="/wp-admin/admin.php?page=gb_my_class&action=create_blog&user_id=' . $v['ID'] . '">'._l("Create Blog").'</a>';
-                                }
-                                ?>
+                                <a><?=_l("Change Teacher")?></a> | <a><?=_l("Modify Class")?></a>
                             </td>
                         </tr>
                     <?php
@@ -56,16 +47,6 @@
                 </table>
             </div>
         </div>
-    <?php
-    }else {
-        ?>
-        <div id="class_header">
-            <div class="tip"><?=_l("No class charge?")?></div>
-            <input type="button" value="<?=_l("Add Class")?>" data-toggle="modal" data-target="#myModal">
-        </div>
-    <?php
-    }
-    ?>
 </div>
 
 <!-- Modal -->
