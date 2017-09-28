@@ -9,38 +9,33 @@ class GbClass {
 
     }
 
-    public function getLists() {
+    public function getLists($start = 0, $number = 0) {
         global $wpdb;
 
         $prefix = $wpdb->get_blog_prefix(1);
 
-        $sql = "select * from gb_class where class_status=1";
+        $sql = "select c.*,t1.* from gb_class c
+                left join (select u.*, um.meta_value class_id from ".$prefix."users u inner join ".$prefix."usermeta um on um.user_id=u.ID where um.meta_key='teach_class') t1 on t1.class_id=c.id
+                where c.class_status=1";
 
+        if($number > 0) {
+            $sql .= " limit " . ceil($start) . ",$number";
+        }
         $results = $wpdb->get_results($sql, ARRAY_A);
-
-        for($i=0;$i<count($results);$i++) {
-            $ids .= $results[$i]['id'] . ",";
-        }
-
-        if($ids) {
-            $ids = substr($ids, 0, -1);
-            $sql = "select u.*, um.meta_value from " . $prefix . "users
-                inner join " . $prefix . "usermeta um on um.user_id=users.ID
-                where um.meta_key='teach_class' and um.meta_value in ($ids)";
-            $t_results = $wpdb->get_results($sql, ARRAY_A);
-            for($i=0;$i<count($t_results);$i++) {
-                $v = $t_results[$i];
-                for($j=0;$j<count($results);$j++) {
-                    if($v['meta_value'] == $results[$i]['id']) {
-                        $results[$i] = array_merge($results[$i], $v);
-                        break;
-                    }
-                }
-            }
-        }
 
         return $results;
 
+    }
+
+    public function getListsTotal() {
+        global $wpdb;
+        $prefix = $wpdb->get_blog_prefix(1);
+        $sql = "select count(c.id) counts from gb_class c
+                left join (select u.*, um.meta_value class_id from ".$prefix."users u inner join ".$prefix."usermeta um on um.user_id=u.ID where um.meta_key='teach_class') t1 on t1.class_id=c.id
+                where c.class_status=1";
+
+        $results = $wpdb->get_row($sql, ARRAY_A);
+        return $results['counts'];
     }
 
     public function instanceObj($id) {

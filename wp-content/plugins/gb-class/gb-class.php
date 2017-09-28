@@ -17,7 +17,9 @@
 require_once "libs/MyClass.php";
 require_once "libs/lang.php";
 require_once "libs/GbClass.php";
+require_once "libs/PageOp.php";
 
+define("_GB_PAGE_NUM", 10);
 //插件启用时检测数据库
 register_activation_hook( __FILE__, 'gb_class_install');
 function gb_class_install() {
@@ -43,7 +45,14 @@ function class_menu() {
 
 function gb_class_manage() {
     $gbClass = new GbClass();
-    $class_lists = $gbClass->getLists();
+    if($_REQUEST['action'] == "save_class") {
+        require_once ("saveClass.php");
+    }
+
+    $page = (ceil($_REQUEST['page'] == 0))?1:ceil($_REQUEST['page']);
+    $start_num = ($page-1) * _GB_PAGE_NUM;
+    $class_lists = $gbClass->getLists($start_num, _GB_PAGE_NUM);
+    $pageOp = new PageOp($page, $gbClass->getListsTotal(), _GB_PAGE_NUM, "");
     require_once "view/manage-class.php";
 }
 function gb_my_class() {
