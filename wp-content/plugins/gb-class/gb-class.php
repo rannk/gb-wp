@@ -20,6 +20,8 @@ require_once "libs/GbClass.php";
 require_once "libs/PageOp.php";
 
 define("_GB_PAGE_NUM", 10);
+define("_GB_CAP", 'gb_my_class'); //编辑操作的权限名称
+
 //插件启用时检测数据库
 register_activation_hook( __FILE__, 'gb_class_install');
 function gb_class_install() {
@@ -40,11 +42,47 @@ add_action( 'admin_menu', 'class_menu' );
 
 function class_menu() {
     add_menu_page(_l("Class Manage"), _l("Class Manage"), "administrator", "gb_class_manage", "gb_class_manage", '', 2);
-    add_submenu_page("gb_class_manage", _l("My Class"), _l("My Class"), 'gb_my_class', 'gb_my_class', 'gb_my_class');
+    add_submenu_page("gb_class_manage", _l("My Class"), _l("My Class"), _GB_CAP, 'gb_my_class', 'gb_my_class');
 }
 
 function gb_class_manage() {
     $gbClass = new GbClass();
+
+    if($_REQUEST['action'] == "change_teacher") {
+        $ret_msg = array();
+
+        $account = trim($_REQUEST['teacher_account']);
+        $class_id = ceil($_REQUEST['class_id']);
+        $original_teacher_id = "";
+
+        if(!$account) {
+            $ret_msg[] = _l("Please fill in the teacher's login account");
+        }
+
+        if(count($ret_msg) == 0) {
+            $id = $gbClass->checkTeacherAccount($account);
+            if(!$id) {
+                $ret_msg[] = _l("This is not teacher's account!");
+            }
+        }
+
+        if(count($ret_msg) == 0) {
+            $classObj = $gbClass->instanceObj($class_id);
+            if(!$classObj->actived()) {
+                $ret_msg[] = _l("The class is not exist!");
+            }
+            $original_teacher_info = $gbClass->getClassTeacher($class_id);
+            $original_teacher_id = $original_teacher_info['ID'];
+        }
+
+
+
+        if(count($ret_msg) == 0) {
+            update_user_meta($id, "teach_class", $classObj->getKeyId());
+            $gbClass->updateTeacherCabForClassStudents($original_teacher_id, $id, $class_id);
+        }
+    }
+
     if($_REQUEST['action'] == "save_class") {
         require_once ("saveClass.php");
     }
@@ -55,6 +93,7 @@ function gb_class_manage() {
     $pageOp = new PageOp($page, $gbClass->getListsTotal(), _GB_PAGE_NUM, "");
     require_once "view/manage-class.php";
 }
+
 function gb_my_class() {
     $myClass = new MyClass();
     $gbClass = new GbClass();
@@ -77,6 +116,7 @@ function gb_my_class() {
             $gbClass->changeClassTeacher(get_current_user_id());
         }
     }
+
 
     $classObj = $gbClass->instanceObj($class_id);
 

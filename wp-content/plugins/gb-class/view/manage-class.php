@@ -94,7 +94,7 @@
                     </div>
                     <div class="form-group">
                         <label for="exampleInputEmail1"><?=_l("Please fill in the teacher's login account")?></label>
-                        <input type="email" class="form-control" id="class_tag" name="class_tag" >
+                        <input type="email" class="form-control"  name="teacher_account" >
                     </div>
                 </form>
             </div>
@@ -125,7 +125,7 @@
 
     jQuery(".c_t").click(function(){
         jQuery("#class_title").html(jQuery(this).parent().parent().attr("data-class-name") + " (" + jQuery(this).parent().parent().attr("data-class-tag") + ")");
-        jQuery("#c_class_id").val(jQuery(this).parent().parent().attr("data-id")");
+        jQuery("#c_class_id").val(jQuery(this).parent().parent().attr("data-id"));
         jQuery("#changeTeacherModal").modal("show");
     })
 </script>
