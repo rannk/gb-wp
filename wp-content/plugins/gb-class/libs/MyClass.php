@@ -21,7 +21,7 @@ class MyClass {
      * @return bool
      */
     public function canCreateBlog($user_id) {
-        if(!current_user_can("create_blog")) {
+        if(!current_user_can(_GB_CAP)) {
             return;
         }
 

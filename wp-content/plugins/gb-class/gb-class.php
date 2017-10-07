@@ -19,8 +19,9 @@ require_once "libs/lang.php";
 require_once "libs/GbClass.php";
 require_once "libs/PageOp.php";
 
-define("_GB_PAGE_NUM", 10);
+define("_GB_PAGE_NUM", 2);
 define("_GB_CAP", 'gb_my_class'); //编辑操作的权限名称
+define("_GB_TEACHER_ROLE", 'editor');
 
 //插件启用时检测数据库
 register_activation_hook( __FILE__, 'gb_class_install');
@@ -78,8 +79,50 @@ function gb_class_manage() {
 
 
         if(count($ret_msg) == 0) {
+            $gbClass->removeTeacherCab($id);
+            $gbClass->removeTeacherCab($original_teacher_id, true);
+            $gbClass->updateTeacherCabForClassStudents($id, $class_id);
             update_user_meta($id, "teach_class", $classObj->getKeyId());
-            $gbClass->updateTeacherCabForClassStudents($original_teacher_id, $id, $class_id);
+            gotoUrl("/wp-admin/admin.php?page=gb_class_manage&_s_page=" . $_REQUEST['_s_page']);
+        }
+    }
+
+    if($_REQUEST['action'] == "add_student") {
+        $account = trim($_REQUEST['student_account']);
+        $class_id = ceil($_REQUEST['class_id']);
+
+        if(!$account) {
+            $ret_msg[] = _l("Please fill in the student's login account");
+        }
+
+        if(count($ret_msg) == 0) {
+            $classObj = $gbClass->instanceObj($class_id);
+            if(!$classObj->actived()) {
+                $ret_msg[] = _l("The class is not exist!");
+            }
+        }
+
+        if(count($ret_msg) == 0) {
+            $user_id = $gbClass->getUserIdByAccount($account);
+            if(!$user_id) {
+                $ret_msg[] = _l("Please fill in the right account");
+            }
+        }
+
+        if(count($ret_msg) == 0) {
+            $original_class_arr = get_user_meta($user_id, "study_class");
+            update_user_meta($user_id, "study_class", $class_id);
+            $gbClass->setClassStudentCounts($class_id);
+            $original_teacher_info = $gbClass->getClassTeacher($class_id);
+            $original_teacher_id = $original_teacher_info['ID'];
+            $gbClass->addUserBlogCabForTeacher($original_teacher_id, $user_id);
+
+            // original class operation
+            $gbClass->setClassStudentCounts($original_class_arr[0]);
+            $original_teacher_info = $gbClass->getClassTeacher($original_class_arr[0]);
+            $original_teacher_id = $original_teacher_info['ID'];
+            $gbClass->removeUserBlogCabFromTeacher($original_teacher_id, $user_id);
+            gotoUrl("/wp-admin/admin.php?page=gb_class_manage&_s_page=" . $_REQUEST['_s_page']);
         }
     }
 
@@ -87,7 +130,7 @@ function gb_class_manage() {
         require_once ("saveClass.php");
     }
 
-    $page = (ceil($_REQUEST['page'] == 0))?1:ceil($_REQUEST['page']);
+    $page = (ceil($_REQUEST['_s_page'] == 0))?1:ceil($_REQUEST['_s_page']);
     $start_num = ($page-1) * _GB_PAGE_NUM;
     $class_lists = $gbClass->getLists($start_num, _GB_PAGE_NUM);
     $pageOp = new PageOp($page, $gbClass->getListsTotal(), _GB_PAGE_NUM, "");
@@ -125,4 +168,7 @@ function gb_my_class() {
     require_once "view/my-class.php";
 }
 
+function gotoUrl($url) {
+    echo "<script>document.location='" . $url . "'</script>";
+}
 

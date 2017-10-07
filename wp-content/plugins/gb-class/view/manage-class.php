@@ -89,12 +89,13 @@
             <div class="modal-body">
                 <form action="/wp-admin/admin.php?page=gb_class_manage&action=change_teacher" method="post" id="change_teacher_form">
                     <input type="hidden" name="class_id" id="c_class_id">
+                    <input type="hidden" name="_s_page" value="<?=$_REQUEST['_s_page']?>">
                     <div class="form-group" id="class_title">
 
                     </div>
                     <div class="form-group">
                         <label for="exampleInputEmail1"><?=_l("Please fill in the teacher's login account")?></label>
-                        <input type="email" class="form-control"  name="teacher_account" >
+                        <input type="text" class="form-control"  name="teacher_account" >
                     </div>
                 </form>
             </div>
@@ -114,14 +115,15 @@
                 <h4 class="modal-title" id="myModalLabel"><?=_l("Add Student")?></h4>
             </div>
             <div class="modal-body">
-                <form action="/wp-admin/admin.php?page=gb_class_manage&action=change_teacher" method="post" id="add_student_form">
+                <form action="/wp-admin/admin.php?page=gb_class_manage&action=add_student" method="post" id="add_student_form">
                     <input type="hidden" name="class_id" id="s_class_id">
+                    <input type="hidden" name="_s_page" value="<?=$_REQUEST['_s_page']?>">
                     <div class="form-group" id="s_class_title">
 
                     </div>
                     <div class="form-group">
                         <label for="exampleInputEmail1"><?=_l("Please fill in the student's login account")?></label>
-                        <input type="email" class="form-control"  name="student_account" >
+                        <input type="text" class="form-control"  name="student_account" >
                     </div>
                 </form>
             </div>

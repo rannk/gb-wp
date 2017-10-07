@@ -76,7 +76,7 @@ class PageOp {
 	function PageShow(){
 	    if($this->CRecord > 0){
 			$form_con  = '<form name="spilt_page_form" id="spilt_page_form" action="'.$_SERVER["REQUEST_URI"].'" method="post">';
-			$form_con .= '<input type="hidden" name="page">';
+			$form_con .= '<input type="hidden" name="_s_page">';
 			
 			if($this->link_where != ""){
 				$where = explode("&",$this->link_where);
@@ -92,7 +92,7 @@ class PageOp {
 			
 			$form_con .= "<script language='javascript'>\n";
 			$form_con .= "function pagechange(pg){ \n";
-			$form_con .= "if(pg>0){ document.getElementById('spilt_page_form').page.value=pg; document.getElementById('spilt_page_form').submit();}}</script>";
+			$form_con .= "if(pg>0){ document.getElementById('spilt_page_form')._s_page.value=pg; document.getElementById('spilt_page_form').submit();}}</script>";
 
 			$multi = $this  ->  Multi($this->CRecord,$this->PageSize,$this->Page,"");
 			return  "<nav>".$multi. $form_con."</nav>";

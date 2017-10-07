@@ -78,7 +78,7 @@ class GbClass {
         $result = $wpdb->get_row($sql, ARRAY_A);
 
         if($result['ID']) {
-            if(user_can($result['ID'], _GB_CAP)) {
+            if(user_can($result['ID'], _GB_CAP) && user_can($result['ID'], _GB_TEACHER_ROLE)) {
                 return $result['ID'];
             }
         }
@@ -102,14 +102,13 @@ class GbClass {
      * @param $new_teacher_id
      * @param $class_id
      */
-    public function updateTeacherCabForClassStudents($original_teacher_id, $new_teacher_id, $class_id) {
+    public function updateTeacherCabForClassStudents( $new_teacher_id, $class_id) {
         global $wpdb;
         $prefix = $wpdb->get_blog_prefix(1);
 
-        $original_teacher_id = ceil($original_teacher_id);
         $teacher_id = ceil($new_teacher_id);
         $class_id = ceil($class_id);
-        if(!$original_teacher_id || !$teacher_id || !$class_id) {
+        if(!$teacher_id || !$class_id) {
             return;
         }
 
@@ -117,12 +116,77 @@ class GbClass {
               inner join '.$prefix.'usermeta um2 on um1.user_id=um2.user_id
               where um1.meta_key="study_class" and um2.meta_key="primary_blog" and um1.meta_value='.$class_id;
         $results = $wpdb->get_results($sql, ARRAY_A);
+
         for($i=0;$i<count($results);$i++) {
             $v = $results[$i];
-            if($original_teacher_id > 0) {
-                remove_user_from_blog($original_teacher_id, $v['meta_value']);
-            }
-            add_user_to_blog($v['meta_value'], $teacher_id, _GB_CAP);
+            add_user_to_blog($v['meta_value'], $teacher_id, _GB_TEACHER_ROLE);
         }
+    }
+
+
+    public function removeTeacherCab($teacher_id, $remove_class = false) {
+        global $wpdb;
+        $prefix = $wpdb->get_blog_prefix(1);
+
+        $teacher_id = ceil($teacher_id);
+        $sql = "select meta_value from {$prefix}usermeta where meta_key='teach_class' and user_id=$teacher_id";
+        $result =  $wpdb->get_row($sql, ARRAY_A);
+        $class_id = $result['meta_value'];
+
+        $blog_arr = get_user_meta($teacher_id, "primary_blog");
+
+        $sql = 'select um1.user_id, um2.meta_value from '.$prefix.'usermeta um1
+              inner join '.$prefix.'usermeta um2 on um1.user_id=um2.user_id
+              where um1.meta_key="study_class" and um2.meta_key="primary_blog" and um1.meta_value='.$class_id;
+        $results = $wpdb->get_results($sql, ARRAY_A);
+        for($i=0;$i<count($results);$i++) {
+            $v = $results[$i];
+
+            if($blog_arr[0] == $v['meta_value']) {
+                continue;
+            }
+
+            if($v['meta_value']>1) {
+                remove_user_from_blog($teacher_id, $v['meta_value']);
+            }
+        }
+
+        if($remove_class) {
+            delete_user_meta($teacher_id, "teach_class");
+        }
+    }
+
+    public function addUserBlogCabForTeacher($teacher_id, $user_id) {
+        $blog_id = get_user_meta($user_id, "primary_blog");
+        if($blog_id[0] > 1 && $teacher_id > 0) {
+            add_user_to_blog($blog_id[0], $teacher_id, _GB_TEACHER_ROLE);
+        }
+    }
+
+    public function removeUserBlogCabFromTeacher($teacher_id, $user_id) {
+        $blog_id = get_user_meta($user_id, "primary_blog");
+        if($blog_id[0] > 1 && $teacher_id > 0) {
+            remove_user_from_blog($teacher_id, $blog_id[0]);
+        }
+    }
+
+    public function getUserIdByAccount($account) {
+        global $wpdb;
+        $prefix = $wpdb->get_blog_prefix(1);
+
+        $sql = "select * from {$prefix}users where user_login='".addslashes($account)."'";
+        $result = $wpdb->get_row($sql, ARRAY_A);
+        return $result['ID'];
+    }
+
+    public function setClassStudentCounts($class_id) {
+        global $wpdb;
+        $prefix = $wpdb->get_blog_prefix(1);
+
+        $class_id = ceil($class_id);
+        $sql = "select count(*) counts from {$prefix}usermeta where meta_key='study_class' and meta_value=$class_id";
+        $result = $wpdb->get_row($sql, ARRAY_A);
+        $sql = "update gb_class set student_count=".$result['counts']." where id=$class_id";
+        $wpdb->query($sql);
     }
 } 
