@@ -2,7 +2,9 @@
 <link rel="stylesheet" href="/wp-content/plugins/gb-class/css/bootstrap.css" type="text/css">
 <div class="wrap nosubsub">
     <h1><?=_l("Class Manage")?> </h1>
-    <input type="button" value="<?=_l("Add Class")?>" data-toggle="modal" data-target="#myModal">
+    <div id="class_header">
+        <input type="button" value="<?=_l("Add Class")?>" data-toggle="modal" data-target="#myModal">
+    </div>
     <?php
     for($i=0;$i<count($ret_msg);$i++) {
         echo '<div class="err_msg">' . $ret_msg[$i] . "</div>";
@@ -34,7 +36,7 @@
                         ?>
                         <tr id="tag-<?= $i ?>" data-class-name="<?= $v['class_name'] ?>" data-class-tag="<?= $v['class_tag'] ?>" data-id="<?= $v['id'] ?>">
                             <td class="username column-username has-row-actions column-primary">
-                                <strong><?= $v['class_name'] ?></strong></td>
+                                <a href="/wp-admin/admin.php?page=gb_class_manage&class_id=<?=$v['id']?>"><strong><?= $v['class_name'] ?></strong></a></td>
                             <td><?= $v['class_tag'] ?></td>
                             <td><?= $v['display_name'] ?></td>
                             <td><?= $v['student_count'] ?></td>

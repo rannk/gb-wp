@@ -482,6 +482,8 @@ function wp_admin_bar_my_sites_menu( $wp_admin_bar ) {
 	}
 
 	// Add site links
+    /* rannk core-update
+     * don't want all site link in the menu
 	$wp_admin_bar->add_group( array(
 		'parent' => 'my-sites',
 		'id'     => 'my-sites-list',
@@ -489,7 +491,7 @@ function wp_admin_bar_my_sites_menu( $wp_admin_bar ) {
 			'class' => is_super_admin() ? 'ab-sub-secondary' : '',
 		),
 	) );
-
+    */
 	foreach ( (array) $wp_admin_bar->user->blogs as $blog ) {
 		switch_to_blog( $blog->userblog_id );
 
@@ -825,7 +827,9 @@ function wp_admin_bar_updates_menu( $wp_admin_bar ) {
 
 	$update_data = wp_get_update_data();
 
-	if ( !$update_data['counts']['total'] )
+    // rannk update-core
+    // don't want update display
+	if ( !$update_data['counts']['total'] || true)
 		return;
 
 	$title = '<span class="ab-icon"></span><span class="ab-label">' . number_format_i18n( $update_data['counts']['total'] ) . '</span>';

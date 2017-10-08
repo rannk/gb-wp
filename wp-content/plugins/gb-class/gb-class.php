@@ -19,7 +19,7 @@ require_once "libs/lang.php";
 require_once "libs/GbClass.php";
 require_once "libs/PageOp.php";
 
-define("_GB_PAGE_NUM", 2);
+define("_GB_PAGE_NUM", 20);
 define("_GB_CAP", 'gb_my_class'); //编辑操作的权限名称
 define("_GB_TEACHER_ROLE", 'editor');
 
@@ -124,6 +124,25 @@ function gb_class_manage() {
             $gbClass->removeUserBlogCabFromTeacher($original_teacher_id, $user_id);
             gotoUrl("/wp-admin/admin.php?page=gb_class_manage&_s_page=" . $_REQUEST['_s_page']);
         }
+    }
+
+    if( $_REQUEST['class_id'] > 0) {
+        $myClass = new MyClass();
+        $class_id = $_REQUEST['class_id'];
+        $classObj = $gbClass->instanceObj($class_id);
+        $students = $myClass->getClassStudents($class_id);
+
+        if(!$classObj->actived()) {
+            gotoUrl("/wp-admin/admin.php?page=gb_class_manage");
+            return;
+        }
+
+        if($_REQUEST['action'] == "update_class") {
+            require_once ("saveClass.php");
+        }
+
+        require_once "view/list-class.php";
+        return;
     }
 
     if($_REQUEST['action'] == "save_class") {

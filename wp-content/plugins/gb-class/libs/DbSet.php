@@ -42,7 +42,9 @@ class DbSet {
                 if($k == $this->key_name)
                     continue;
 
-                $this->fields[$k] = $post_info[$k];
+                if(isset($post_info[$k])) {
+                    $this->fields[$k] = $post_info[$k];
+                }
             }
         }
     }

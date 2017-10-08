@@ -189,7 +189,9 @@ function find_core_update( $version, $locale ) {
  * @return string
  */
 function core_update_footer( $msg = '' ) {
-	if ( !current_user_can('update_core') )
+    // rannk update-core
+    // don't want update display
+	if ( !current_user_can('update_core') || true)
 		return sprintf( __( 'Version %s' ), get_bloginfo( 'version', 'display' ) );
 
 	$cur = get_preferred_from_update_core();
@@ -225,7 +227,9 @@ function core_update_footer( $msg = '' ) {
  * @return false|void
  */
 function update_nag() {
-	if ( is_multisite() && !current_user_can('update_core') )
+    // rannk update-core
+    // don't want update display
+	if ( is_multisite() && !current_user_can('update_core') || true)
 		return false;
 
 	global $pagenow;
