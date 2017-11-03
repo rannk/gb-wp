@@ -93,7 +93,7 @@ class MyClass {
         $sql = "select u.*,b.* from " . $prefix."users u inner join
             "  . $prefix ."usermeta um1 on um1.user_id=u.ID
             inner join " . $prefix . "usermeta um2 on um2.user_id=u.ID
-            inner join ". $prefix . "blogs b on um2.meta_value=b.blog_id
+            left join ". $prefix . "blogs b on um2.meta_value=b.blog_id
             where um1.meta_key='study_class' and um2.meta_key='primary_blog' and um1.meta_value=" . $class_id;
 
         return $wpdb->get_results($sql, ARRAY_A);

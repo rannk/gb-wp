@@ -50,7 +50,7 @@ class GbClass {
         global $wpdb;
 
         $sql = "select id from gb_class where class_tag='".addslashes($tag)."'";
-        if($this->classObj->actived()) {
+        if(is_object($this->classObj) && $this->classObj->actived()) {
             $sql .= " and id != " . $this->classObj->getKeyId();
         }
 
@@ -61,6 +61,14 @@ class GbClass {
         }
 
         return false;
+    }
+
+    public function getClassByTag($tag) {
+        global $wpdb;
+        $tag = trim($tag);
+        $sql = "select * from gb_class where class_tag='".addslashes($tag)."'";
+        $results = $wpdb->get_results($sql, ARRAY_A);
+        return $results[0];
     }
 
     public function changeClassTeacher($id) {

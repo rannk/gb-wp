@@ -33,3 +33,4 @@ $_langmsg[] = array("Add Student", "添加学生");
 $_langmsg[] = array("Please fill in the teacher's login account", "请填写老师登陆账户");
 $_langmsg[] = array("This is not teacher's account!", "这不是合法的老师账户");
 $_langmsg[] = array("Please fill in the student's login account", "请填写学生登陆账户");
+$_langmsg[] = array("No Blog", "未开通博客");

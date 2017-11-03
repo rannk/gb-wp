@@ -676,7 +676,7 @@ login_footer('user_pass');
 break;
 
 case 'register' :
-	if ( is_multisite() ) {
+	if ( false ) {
 		/**
 		 * Filters the Multisite sign up URL.
 		 *
