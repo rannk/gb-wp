@@ -69,12 +69,11 @@ class MyClass {
         $id = wpmu_create_blog( $newdomain, $path, $title, $user_id, $meta, get_current_network_id() );
         $wpdb->show_errors();
         if ( ! is_wp_error( $id ) ) {
-            if ( ! is_super_admin( $user_id ) && !(get_user_option( 'primary_blog', $user_id )>1)) {
-                update_user_option( $user_id, 'primary_blog', $id, true );
-                add_user_to_blog($id, $user_id, 'contributor');
+            add_user_to_blog($id, $user_id, 'contributor');
+            update_user_option( $user_id, 'primary_blog', $id, true );
+            if ( ! is_super_admin( $user_id ) && !(get_user_option( 'primary_blog', $this->teacher_id )>1)) {
                 //添加老师id到blog
                 add_user_to_blog($id, $this->teacher_id, 'editor');
-
             }
         } else {
             wp_die( $id->get_error_message() );
