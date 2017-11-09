@@ -50,7 +50,7 @@ function wp_new_user_notification($user_id, $plaintext_pass = '', $flag='') {
 	// 你可以在此修改发送给用户的注册通知Email
 	$message  = sprintf(__('Username: %s'), $user_login) . "\r\n";
 	$message .= sprintf(__('Password: %s'), $plaintext_pass) . "\r\n";
-	$message .= '登陆网址: ' . wp_login_url() . "\r\n";
+	$message .= 'Login URL: ' . wp_login_url() . "\r\n";
 
 	// sprintf(__('[%s] Your username and password'), $blogname) 为邮件标题
 	wp_mail($user_email, sprintf(__('[%s] Your username and password'), $blogname), $message);
@@ -82,35 +82,35 @@ function ludou_show_password_field() {
 -->
 </style>
 <p>
-	<label for="user_nick">昵称<br/>
+	<label for="user_nick">Real Name<br/>
 		<input id="user_nick" class="input" type="text" size="25" value="<?php echo empty($_POST['user_nick']) ? '':$_POST['user_nick']; ?>" name="user_nick" />
 	</label>
 </p>
 <p>
-	<label for="user_pwd1">密码(至少6位)<br/>
+	<label for="user_pwd1">Password(At least 6)<br/>
 		<input id="user_pwd1" class="input" type="password" size="25" value="" name="user_pass" />
 	</label>
 </p>
 <p>
-	<label for="user_pwd2">重复密码<br/>
+	<label for="user_pwd2">Repeat Password<br/>
 		<input id="user_pwd2" class="input" type="password" size="25" value="" name="user_pass2" />
 	</label>
 </p>
 <p style="margin:0 0 10px;">
-	<label>所在班级编号:
+	<label>Class Number:
         <input id="class_tag" class="input" type="text" size="25" value="<?=$_POST['class_tag']?>" name="class_tag" />
 	</label>
 	<br />
 </p>
 <p>
-	<label for="CAPTCHA">验证码:<br />
+	<label for="CAPTCHA">Verification Code:<br />
 		<input id="CAPTCHA" style="width:110px;*float:left;" class="input" type="text" size="10" value="" name="captcha_code" />
-		看不清？<a href="javascript:void(0)" onclick="document.getElementById('captcha_img').src='<?php echo constant("LCR_PLUGIN_URL"); ?>/captcha/captcha.php?'+Math.random();document.getElementById('CAPTCHA').focus();return false;">点击更换</a>
+		Can't see clearly?<a href="javascript:void(0)" onclick="document.getElementById('captcha_img').src='<?php echo constant("LCR_PLUGIN_URL"); ?>/captcha/captcha.php?'+Math.random();document.getElementById('CAPTCHA').focus();return false;">Click to switch</a>
 	</label>
 </p>
 <p>
 	<label>
-	<img id="captcha_img" src="<?php echo constant("LCR_PLUGIN_URL"); ?>/captcha/captcha.php" title="看不清?点击更换" alt="看不清?点击更换" onclick="document.getElementById('captcha_img').src='<?php echo constant("LCR_PLUGIN_URL"); ?>/captcha/captcha.php?'+Math.random();document.getElementById('CAPTCHA').focus();return false;" />
+	<img id="captcha_img" src="<?php echo constant("LCR_PLUGIN_URL"); ?>/captcha/captcha.php" title="Can't see clearly?Click to switch" alt="Can't see clearly?Click to switch" onclick="document.getElementById('captcha_img').src='<?php echo constant("LCR_PLUGIN_URL"); ?>/captcha/captcha.php?'+Math.random();document.getElementById('CAPTCHA').focus();return false;" />
 	</label>
 </p>
 <input type="hidden" name="spam_check" value="<?php echo $token; ?>" />
@@ -120,32 +120,32 @@ function ludou_show_password_field() {
 /* 处理表单提交的数据 */
 function ludou_check_fields($login, $email, $errors) {
   if(empty($_POST['spam_check']) || $_POST['spam_check'] != $_SESSION['ludou_register_584226_token'])
-		$errors->add('spam_detect', "<strong>错误</strong>：请勿恶意注册");
+		$errors->add('spam_detect', "<strong>Wrong</strong>：Please do not register maliciously");
 		
 	if(empty($_POST['captcha_code'])
 		|| empty($_SESSION['ludou_lcr_secretword'])
 		|| (trim(strtolower($_POST['captcha_code'])) != $_SESSION['ludou_lcr_secretword'])
 		) {
-		$errors->add('captcha_spam', "<strong>错误</strong>：验证码不正确");
+		$errors->add('captcha_spam', "<strong>Wrong</strong>：Incorrect verification code");
 	}
 	unset($_SESSION['ludou_lcr_secretword']);
 	
 	if (!isset($_POST['user_nick']) || trim($_POST['user_nick']) == '')
-	  $errors->add('user_nick', "<strong>错误</strong>：昵称必须填写");
+	  $errors->add('user_nick', "<strong>Wrong</strong>：Real Name must be filled in");
 	  
 	if(strlen($_POST['user_pass']) < 6)
-		$errors->add('password_length', "<strong>错误</strong>：密码长度至少6位");
+		$errors->add('password_length', "<strong>Wrong</strong>：The length of password must be at least 6");
 	elseif($_POST['user_pass'] != $_POST['user_pass2'])
-		$errors->add('password_error', "<strong>错误</strong>：两次输入的密码必须一致");
+		$errors->add('password_error', "<strong>Wrong</strong>：The password must be the same for the two input");
 
     // check class tag
     $gbClass = new GbClass();
     $class_tag = trim($_POST['class_tag']);
     if($class_tag == "") {
-        $errors->add('class_error', "<strong>错误</strong>：请填写班级编号");
+        $errors->add('class_error', "<strong>Wrong</strong>：Please fill in the class number");
     }else {
         if(!$gbClass->checkTagUnique($class_tag)) {
-            $errors->add('class_error', "<strong>错误</strong>：填写的班级编号不存在");
+            $errors->add('class_error', "<strong>Wrong</strong>：The class number does not exist");
         }
     }
 }
@@ -186,7 +186,7 @@ function ludou_register_change_translated_text( $translated_text, $untranslated_
   if ( $untranslated_text === 'A password will be e-mailed to you.' || $untranslated_text === 'Registration confirmation will be emailed to you.' )
     return '';
   else if ($untranslated_text === 'Registration complete. Please check your e-mail.' || $untranslated_text === 'Registration complete. Please check your email.')
-    return '注册成功！';
+    return 'Registered successfully！';
   else
     return $translated_text;
 }
