@@ -130,6 +130,11 @@ function gb_class_manage() {
         $myClass = new MyClass();
         $class_id = $_REQUEST['class_id'];
         $classObj = $gbClass->instanceObj($class_id);
+
+        if($_REQUEST['action'] == "set_visit_pwd") {
+            require_once("visitPwd.php");
+        }
+
         $students = $myClass->getClassStudents($class_id);
 
         if(!$classObj->actived()) {
@@ -179,6 +184,12 @@ function gb_my_class() {
         }
     }
 
+    if($_REQUEST['action'] == "set_visit_pwd") {
+        if($myClass->canChangeVisitPwd($_REQUEST['user_id'])) {
+            require_once("visitPwd.php");
+        }
+    }
+
 
     $classObj = $gbClass->instanceObj($class_id);
 
@@ -191,3 +202,83 @@ function gotoUrl($url) {
     echo "<script>document.location='" . $url . "'</script>";
 }
 
+add_action( 'wp', 'need_password' );
+
+function need_password() {
+    $gbClass = new GbClass();
+
+    $confirm_window = <<<html
+<form action="" method="post" id="post_pwd">
+<input id="given_pwd" name="given_pwd" value="" type="hidden">
+</form>
+<script language="javascript">
+
+function show_pwd() {
+    var pwd = prompt("{message}");
+    if(pwd) {
+        document.getElementById("given_pwd").value = pwd;
+        document.getElementById("post_pwd").submit();
+    }else {
+        show_pwd();
+    }
+}
+show_pwd();
+</script>
+html;
+
+    // main blog don't need pwd
+    $blog_id = get_current_blog_id();
+    if($blog_id == 1)
+        return;
+
+    if($_SESSION['blog_' . $blog_id. "_sec"]) {
+        return;
+    }
+
+    $user_visit_pwd = $gbClass->getVisitPwdByBlogId($blog_id);
+
+    // if user not set pwd
+    if(!$user_visit_pwd) {
+        return;
+    }
+
+    // 用户自己博客不需要密码
+    $user_id = get_current_user_id();
+
+    if($user_id) {
+        $user_blog_id = get_user_meta($user_id, "primary_blog");
+        if($user_blog_id[0] == $blog_id) {
+            return;
+        }
+    }
+
+    if(!$_POST['given_pwd']) {
+        $confirm_window = str_replace("{message}", _l("Please fill in the password for visiting this blog!"), $confirm_window);
+        echo $confirm_window;
+        exit;
+    }
+
+    if($_POST['given_pwd'] == $user_visit_pwd) {
+        $_SESSION['blog_' . $blog_id. "_sec"] = $user_visit_pwd;
+    }else {
+        $confirm_window = str_replace("{message}", _l("Password was wrong, please fill again!"), $confirm_window);
+        echo $confirm_window;
+        exit;
+    }
+}
+add_action( 'admin_menu', 'set_visit_password_menu' );
+
+function set_visit_password_menu() {
+    add_submenu_page("profile.php", _l("Blog Visit Password"), _l("Blog Visit Password"), "contributor", "user_set_visit_password", "user_set_visit_password");
+
+}
+
+function user_set_visit_password() {
+    $user_id = get_current_user_id();
+    if($_POST['Submit']) {
+        $password = trim($_POST['visit_pwd']);
+        update_user_meta($user_id, "gb_visit_pwd", $password);
+    }
+    $password = get_user_meta($user_id, "gb_visit_pwd");
+    require_once("view/set-visit-password.php");
+}

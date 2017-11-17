@@ -178,6 +178,11 @@ class GbClass {
         }
     }
 
+    /**
+     * 通过账号获取用户ID
+     * @param $account
+     * @return mixed
+     */
     public function getUserIdByAccount($account) {
         global $wpdb;
         $prefix = $wpdb->get_blog_prefix(1);
@@ -187,6 +192,10 @@ class GbClass {
         return $result['ID'];
     }
 
+    /**
+     * 更新班级学生人数总数
+     * @param $class_id
+     */
     public function setClassStudentCounts($class_id) {
         global $wpdb;
         $prefix = $wpdb->get_blog_prefix(1);
@@ -196,5 +205,25 @@ class GbClass {
         $result = $wpdb->get_row($sql, ARRAY_A);
         $sql = "update gb_class set student_count=".$result['counts']." where id=$class_id";
         $wpdb->query($sql);
+    }
+
+    /**
+     * 通过博客ID获取访问密码
+     * @param $blog_id
+     * @return mixed
+     */
+    public function getVisitPwdByBlogId($blog_id) {
+        global $wpdb;
+        $prefix = $wpdb->get_blog_prefix(1);
+
+        $blog_id = ceil($blog_id);
+
+        $sql = "select user_id from {$prefix}usermeta where meta_value=$blog_id and meta_key='primary_blog'";
+        $result = $wpdb->get_row($sql, ARRAY_A);
+        $user_id = $result['user_id'];
+
+        $sql = "select meta_value from {$prefix}usermeta where meta_key='gb_visit_pwd' and user_id=$user_id";
+        $result = $wpdb->get_row($sql, ARRAY_A);
+        return $result['meta_value'];
     }
 } 

@@ -65,6 +65,12 @@ function ludou_show_password_field() {
 	$_SESSION['ludou_register_584226_token'] = $token;
 	
 	define('LCR_PLUGIN_URL', plugin_dir_url( __FILE__ ));
+
+    // 只允许在主站进行注册
+    if(get_current_blog_id() != 1) {
+        wp_redirect("/wp-login.php?action=register");
+        exit;
+    }
 ?>
 <style type="text/css">
 <!--
@@ -102,6 +108,12 @@ function ludou_show_password_field() {
 	</label>
 	<br />
 </p>
+    <p style="margin:0 0 10px;">
+        <label>Blog Visit Password:
+            <input id="visit_pwd" class="input" type="text" size="25" value="<?=$_POST['visit_pwd']?>" name="visit_pwd" />
+        </label>
+        <br />
+    </p>
 <p>
 	<label for="CAPTCHA">Verification Code:<br />
 		<input id="CAPTCHA" style="width:110px;*float:left;" class="input" type="text" size="10" value="" name="captcha_code" />
@@ -148,6 +160,11 @@ function ludou_check_fields($login, $email, $errors) {
             $errors->add('class_error', "<strong>Wrong</strong>：The class number does not exist");
         }
     }
+
+    $visit_pwd = trim($_POST['visit_pwd']);
+    if(!$visit_pwd) {
+        $errors->add("class_error", "<strong>Wrong</strong>：Please fill in your blog visit password");
+    }
 }
 
 /* 保存表单提交的数据 */
@@ -167,6 +184,7 @@ function ludou_register_extra_fields($user_id, $password="", $meta=array()) {
     $class_tag = trim($_POST['class_tag']);
     $class_info = $gbClass->getClassByTag($class_tag);
     update_user_meta($user_id, "study_class", $class_info['id'], true);
+    update_user_meta($user_id, "gb_visit_pwd", $_POST['visit_pwd']);
     remove_user_from_blog($user_id,1);
 
     wp_new_user_notification( $user_id, $_POST['user_pass'], 1 );

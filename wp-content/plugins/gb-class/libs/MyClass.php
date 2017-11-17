@@ -45,6 +45,26 @@ class MyClass {
     }
 
     /**
+     * 判断是否可以修改学生访问密码
+     * @param $user_id
+     * @return bool
+     */
+    public function canChangeVisitPwd($user_id) {
+        $student_meta = get_user_meta($user_id);
+
+        $teacher_meta = get_user_meta($this->teacher_id);
+
+        if(!current_user_can("administrator")) {
+            if($teacher_meta['teach_class'][0] != $student_meta['study_class'][0] || !$teacher_meta['teach_class'] || !$student_meta['study_class']) {
+                return;
+            }
+
+        }
+
+        return true;
+    }
+
+    /**
      * 学生创建blog
      * @param $user_id
      * @param $domain
@@ -90,10 +110,11 @@ class MyClass {
         if($class_id == 0)
             return;
 
-        $sql = "select u.*,b.* from " . $prefix."users u inner join
+        $sql = "select u.*,b.*,um3.visit_password from " . $prefix."users u inner join
             "  . $prefix ."usermeta um1 on um1.user_id=u.ID
             inner join " . $prefix . "usermeta um2 on um2.user_id=u.ID
             left join ". $prefix . "blogs b on um2.meta_value=b.blog_id
+            left join (select user_id, meta_value visit_password from ".$prefix."usermeta where meta_key='gb_visit_pwd') um3 on um3.user_id=u.ID
             where um1.meta_key='study_class' and um2.meta_key='primary_blog' and um1.meta_value=" . $class_id;
 
         return $wpdb->get_results($sql, ARRAY_A);
