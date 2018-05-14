@@ -42,3 +42,4 @@ $_langmsg[] = array("Password", "密码");
 $_langmsg[] = array("please fill in the visit password", "请填写访问密码");
 $_langmsg[] = array("You didn't select the student", "你没有选择学生");
 $_langmsg[] = array("Blog Visit Password", "博客访问密码");
+$_langmsg[] = array("Students", "");

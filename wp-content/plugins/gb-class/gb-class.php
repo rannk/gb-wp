@@ -19,7 +19,7 @@ require_once "libs/lang.php";
 require_once "libs/GbClass.php";
 require_once "libs/PageOp.php";
 
-define("_GB_PAGE_NUM", 20);
+define("_GB_PAGE_NUM", 10);
 define("_GB_CAP", 'gb_my_class'); //编辑操作的权限名称
 define("_GB_TEACHER_ROLE", 'editor');
 
@@ -44,6 +44,7 @@ add_action( 'admin_menu', 'class_menu' );
 function class_menu() {
     add_menu_page(_l("Class Manage"), _l("Class Manage"), "administrator", "gb_class_manage", "gb_class_manage", '', 2);
     add_submenu_page("gb_class_manage", _l("My Class"), _l("My Class"), _GB_CAP, 'gb_my_class', 'gb_my_class');
+    add_submenu_page("gb_class_manage", _l("Students"), _l("Students"), "administrator", 'gb_students', 'gb_students');
 }
 
 function gb_class_manage() {
@@ -196,6 +197,42 @@ function gb_my_class() {
     $students = $myClass->getClassStudents($class_id);
 
     require_once "view/my-class.php";
+}
+
+
+function gb_students() {
+    $myClass = new MyClass();
+
+    if($_REQUEST['action'] == "create_blog") {
+        $user_id = $_REQUEST['user_id'];
+        if($myClass->canCreateBlog($user_id)) {
+            $userObj = get_user_to_edit($user_id);
+            if($myClass->setTeacherIdByStudentId($user_id)) {
+                $myClass->createBlog($user_id, $userObj->get("user_login"), $userObj->get("display_name"));
+            }else {
+                $ret_msg[] = "create blog was failed! please try again.";
+            }
+        }else {
+            $ret_msg[] = "you don't have permission to do this.";
+        }
+    }
+
+
+    if($_REQUEST['action'] == "set_visit_pwd") {
+        if($myClass->canChangeVisitPwd($_REQUEST['user_id'])) {
+            require_once("visitPwd.php");
+        }else {
+            $ret_msg[] = "you don't have permission to do this.";
+        }
+    }
+
+    $page = (ceil($_REQUEST['_s_page'] == 0))?1:ceil($_REQUEST['_s_page']);
+
+    $results = $myClass->getStudentsByCond($_REQUEST, $page, _GB_PAGE_NUM);
+
+    $pageOp = new PageOp($page, $results['total'], _GB_PAGE_NUM, $results['cond_query']);
+
+    require_once "view/gb-students.php";
 }
 
 function gotoUrl($url) {
